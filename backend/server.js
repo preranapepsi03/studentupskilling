@@ -1,40 +1,36 @@
 const express = require("express"); 
-const pool= require('./db');
+const pool = require('./db');
 const app = express(); 
-// 1. MIDDLEWARE: This MUST run before your POST route tries to read req.body
+
+// 1. MIDDLEWARE
 app.use(express.json());
 
-// 2. THE DATA ARRAY: This must be defined before the routes use it
-let dynamicTasks= [
-    { id : 1 , title : "Finish Day 3 of Upskilling" , completed : false },
-    { id : 2 , title : "Review JavaScript Array Methods" , completed : true }
-]; 
-
-// 3. GET ROUTE
-app.get("/api/tasks", (req, res) => { 
-    res.json(dynamicTasks);
-}); 
-
-// 4. UPGRADED POST ROUTE 
-app.post("/api/tasks", (req, res) => {
-    const userTitle = req.body.title; 
-
-    if (!userTitle) {
-        return res.status(400).json({ error: "Task title is required!" });
-    } 
-
-    const newTask = { 
-        id: dynamicTasks.length + 1, 
-        title: userTitle, 
-        completed: false 
-    };
-
-    dynamicTasks.push(newTask);
-    res.status(201).json({ message: "Custom task created!", task: newTask });
+// 2. GET ROUTE
+app.get('/tasks', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM tasks ORDER BY id ASC;');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
-// 5. SERVER START: Keep at the very bottom
+// 3. POST ROUTE 
+app.post('/tasks', async (req, res) => {
+  try {
+    const { title } = req.body;
+    const queryText = 'INSERT INTO tasks (title) VALUES ($1) RETURNING *;';
+    const result = await pool.query(queryText, [title]);
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// 4. START SERVER (Added this!)
 const PORT = 5000;
-app.listen(PORT, () => { 
-    console.log(`Server is running successfully on http://localhost:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`🚀 Server is running and listening on port ${PORT}`);
 });
