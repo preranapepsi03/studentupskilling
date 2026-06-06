@@ -1,4 +1,5 @@
 const express = require("express"); 
+const pool= require('./db');
 const app = express(); 
 // 1. MIDDLEWARE: This MUST run before your POST route tries to read req.body
 app.use(express.json());
