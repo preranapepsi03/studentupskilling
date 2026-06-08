@@ -1,8 +1,11 @@
 const express = require("express"); 
 const pool = require('./db');
+const cors = require('cors');
+
 const app = express(); 
 
 // 1. MIDDLEWARE
+app.use(cors());
 app.use(express.json());
 
 // 2. GET ROUTE
