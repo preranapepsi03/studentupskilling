@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  padding: 40px;
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+}
+
+#root {
+  width: 100%;
+  max-width: 500px;
+}
+
+ul {
+  list-style-type: none; /* Removes those stranded bullet points entirely */
+  padding: 0;
+}
