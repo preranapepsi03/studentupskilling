@@ -1,22 +1,13 @@
-const { Pool } = require('pg');
+import pg from 'pg';
 
-// 1. Configure the connection details
-const pool = new Pool({
-  user: 'postgres',              // Your PostgreSQL master username
-  host: 'localhost',             // The database is running locally on your machine
-  database: 'productivity_app',   // The database you created on Day 5
-  password: 'Prersan1234', // ⚠️ Replace this with your actual pgAdmin password!
-  port: 5432,                    // The default PostgreSQL port
+const { Pool } = pg;
+
+export const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'productivity_app', // 👈 Changed this to match your real database name!
+  password: 'Prersan1234',           // Double check that this password is correct for your postgres user
+  port: 5432,
 });
 
-// 2. Test the connection immediately when the app starts
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error('❌ Error connecting to the database:', err.stack);
-  }
-  console.log('🎉 Successfully connected to the PostgreSQL database!');
-  release(); 
-});
-
-// 3. Export the pool so server.js can use it
-module.exports = pool;
+console.log("🔌 PostgreSQL Connection Pool initialized successfully.");

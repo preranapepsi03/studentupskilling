@@ -1,31 +1,31 @@
-// 1. Import the model we just built so we can use its database queries
-const taskModel = require('../models/taskModel');
+// If you are importing your database connection pool from db.js, use a modern import:
+import { pool } from '../db.js'; 
 
-// 2. Handle GET requests (Fetching tasks)
-const getTasks = async (req, res) => {
+// 1. Export getTasks as a modern named export
+export async function getTasks(req, res) {
   try {
-    const tasks = await taskModel.getAllTasks(); // Tell the Model to get data from Postgres
-    res.json(tasks); // Hand that clean data array directly back to the browser/frontend
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error'); // If something broke, tell the browser it's a server issue
+    const result = await pool.query('SELECT * FROM tasks ORDER BY id ASC;');
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Database query error (GET):", error);
+    res.status(500).json({ error: "Internal server database error" });
   }
-};
+}
 
-// 3. Handle POST requests (Adding a new task)
-const addTask = async (req, res) => {
+// 2. Export createTask as a modern named export (This fixes the exact error in your screenshot!)
+export async function createTask(req, res) {
   try {
-    const { title } = req.body; // Unpack the incoming package from the frontend to find the task title
-    const newTask = await taskModel.createTask(title); // Tell the Model to save this specific title
-    res.status(201).json(newTask); // Send back the brand-new task with a "201 Created" success status
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    const { title } = req.body;
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+    const result = await pool.query(
+      'INSERT INTO tasks (title, is_completed) VALUES ($1, false) RETURNING *;',
+      [title]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("❌ Database query error (POST):", error);
+    res.status(500).json({ error: "Internal server database error" });
   }
-};
-
-// 4. Export these functions so our Router file can access them
-module.exports = {
-  getTasks,
-  addTask
-};
+}

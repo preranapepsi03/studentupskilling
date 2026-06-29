@@ -1,21 +1,22 @@
-// 1. Import core packages
-const express = require("express"); 
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import taskRoutes from './routes/taskRoutes.js';
 
-// 2. Import your new router map
-const taskRoutes = require('./routes/taskRoutes'); 
-
-const app = express(); 
-
-// 3. Global Middleware configuration
-app.use(cors());        
-app.use(express.json()); // Allows Express to read incoming JSON packages
-
-// 4. Route Mounting (The secret sauce)
-app.use('/tasks', taskRoutes); 
-
-// 5. Start the Server engine
+const app = express();
 const PORT = 5000;
+
+// Middleware configuration
+app.use(cors());
+app.use(express.json());
+
+// 4. Route Mounting
+app.use('/tasks', taskRoutes);
+
+// Catch-all health diagnostic endpoint
+app.get('/', (req, res) => {
+  res.send({ status: "online", service: "StackTask Database Engine" });
+});
+
 app.listen(PORT, () => {
-    console.log(`🚀 Clean architectural server running on port ${PORT}`);
+  console.log(`🚀 Backend API Server listening on: http://localhost:${PORT}`);
 });
