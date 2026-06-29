@@ -1,12 +1,18 @@
 import express from 'express';
-// If your controller functions are imported here, keep them, or use placeholder functions for now
-import { getTasks, createTask } from '../controllers/taskController.js'; 
+import { getTasks, createTask, updateTask, deleteTask } from '../controllers/taskController.js'; 
 
 const router = express.Router();
 
-// Define your endpoints matching Day 15 & 17
+// Fetch all records
 router.get('/', getTasks);
+
+// Add a new record
 router.post('/', createTask);
 
-// This line is what fixes the exact error in your screenshot!
+// Day 18: Update a task's title by ID
+router.put('/:id', updateTask);
+
+// Day 18: Delete a specific record by ID
+router.delete('/:id', deleteTask); 
+
 export default router;
