@@ -1,32 +1,47 @@
-import React from 'react';
-import Router from 'preact-router';
-import { Navbar } from './components/Navbar';
-import { Sidebar } from './components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import Login from './components/Login';
+import Signup from './components/Signup';
 
-// Import our brand new pages
-import { Home } from './pages/Home';
-import { Dashboard } from './pages/Dashboard';
-import { TasksPage } from './pages/TasksPage';
-
+// Changed to named export to match your main.jsx setup!
 export function App() {
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col antialiased">
-      <Navbar />
-      
-      <div className="flex flex-1 w-full">
-        <Sidebar />
-        
-        <main className="flex-1 p-8 max-w-4xl">
-          {/* Preact Router reads the URL path and displays the correct page instantly */}
-          <Router>
-            <Home path="/" />
-            <Dashboard path="/dashboard" />
-            <TasksPage path="/tasks" />
-          </Router>
-        </main>
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState('login'); // 'login' or 'signup'
+
+  // Day 25: Check storage on mount to see if user is already authenticated
+  useEffect(() => {
+    const storedUser = localStorage.getItem('authUser');
+    const storedToken = localStorage.getItem('authToken');
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+    setUser(null);
+    setView('login');
+  };
+
+  if (user) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h1>🎯 Your Task Dashboard</h1>
+        <p>Logged in securely as: <strong>{user.username}</strong></p>
+        <button onClick={handleLogout} style={{ padding: '10px 20px', backgroundColor: '#DC3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+          Log Out
+        </button>
       </div>
+    );
+  }
+
+  return (
+    <div>
+      {view === 'login' ? (
+        <Login switchToSignup={() => setView('signup')} onLoginSuccess={(loggedInUser) => setUser(loggedInUser)} />
+      ) : (
+        <Signup switchToLogin={() => setView('login')} />
+      )}
     </div>
   );
 }
-
-export default App;
