@@ -1,5 +1,6 @@
 import { pool } from '../db.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // ==========================================
 // DAY 22: Register a brand new user
@@ -37,7 +38,7 @@ export async function signupUser(req, res) {
 }
 
 // ==========================================
-// DAY 23: Authenticate an existing user
+// DAY 23 & 24: Authenticate User & Issue JWT
 // ==========================================
 export async function loginUser(req, res) {
   try {
@@ -52,7 +53,6 @@ export async function loginUser(req, res) {
     const result = await pool.query('SELECT * FROM users WHERE username = $1;', [username.trim()]);
     
     if (result.rowCount === 0) {
-      // Generic security error message
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
@@ -65,9 +65,17 @@ export async function loginUser(req, res) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // 4. Success! Authentication verified
+    // 4. Day 24: Generate a signed JSON Web Token valid for 24 hours
+    const token = jwt.sign(
+      { userId: user.id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // 5. Success! Return the token alongside user details to the frontend client
     res.status(200).json({
       message: "Login successful! Welcome back 👋",
+      token, 
       user: {
         id: user.id,
         username: user.username,

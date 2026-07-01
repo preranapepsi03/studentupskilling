@@ -28,4 +28,5 @@ app.get('/', (req, res) => {
 // Launch the running system node process loop
 app.listen(PORT, () => {
   console.log(`🚀 Backend API Server listening on: http://localhost:${PORT}`);
+  console.log(`🔑 Testing secret loading:`, process.env.JWT_SECRET); // Add this line!
 });
