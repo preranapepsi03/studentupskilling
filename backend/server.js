@@ -1,22 +1,31 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Import our functional feature routing blueprints
 import taskRoutes from './routes/taskRoutes.js';
+import authRoutes from './routes/authRoutes.js'; // Day 22: Authentication entry route
+
+// Configure environment variable injection layers
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Middleware configuration
+// Middleware configuration layers
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Parses incoming application/json payloads automatically
 
-// 4. Route Mounting
+// 🌐 Application Gateway Routing Plugs
 app.use('/tasks', taskRoutes);
+app.use('/auth', authRoutes);   // Day 22: New endpoint tree for /auth/signup
 
-// Catch-all health diagnostic endpoint
+// Root health-check endpoint monitor channel
 app.get('/', (req, res) => {
-  res.send({ status: "online", service: "StackTask Database Engine" });
+  res.json({ status: "online", environment: "development", message: "StackTask API operational pipeline active." });
 });
 
+// Launch the running system node process loop
 app.listen(PORT, () => {
   console.log(`🚀 Backend API Server listening on: http://localhost:${PORT}`);
 });
